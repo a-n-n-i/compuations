@@ -168,7 +168,7 @@ print(if_adjacent_to_stratum(12, [1,2,7,8,9,11],MM,MM2,MM3))
 
 
 ## 4. References
-1. **An, N., Ihringer, F., & Irmer, I.​** (2026). *Small genus, small index critical points of the systole function.*.arXiv preprint arXiv:2504.17316.
+1. **An, N., Ihringer, F., & Irmer, I.​** (2025). *Small genus, small index critical points of the systole function.*.arXiv preprint arXiv:2504.17316.
 2. 
 
 ## 5. Contact
