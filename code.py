@@ -279,7 +279,9 @@ def length_of_curves(x,initial=[0,0,0]):
     else:
         solution = solution
 
+    # length_systole_list is the list containing the length of every closed curve in C
     length_systole_list= [mpmath.mpf(0) for _ in range(int(4*m4))]
+    # length_edge_list is the list containing the length of every pair of edges of the 12-gon
     length_edge_list=[mpmath.mpf(0) for _ in range(int(2*m4))]
     length_edge_list[all_direction[0]]=length_list[Pairs[all_direction[0]][0]]+l0
     length_edge_list[all_direction[1]]=length_list[Pairs[all_direction[1]][0]]+l1
@@ -291,7 +293,8 @@ def length_of_curves(x,initial=[0,0,0]):
         v=color_pairs[i]
         for k in v:
             length_systole_list[i]=length_systole_list[i]+length_edge_list[k]
-    
+
+    # new_length_list1 is the list containing the length of every edge of the 12-gon
     new_length_list1=[mpmath.mpf(0) for _ in range(int(4*m4))]
     for i in range(2*m4):
         new_length_list1[Pairs[i][0]]=length_edge_list[i]
@@ -300,7 +303,7 @@ def length_of_curves(x,initial=[0,0,0]):
 
     Epsilen3=1e-70
     #k=0
-    
+    # coordinate_list is the list of coordinates for all vertices of the 12-gon
     coordinate_list=[]
     coordinate_list.append(1j)
     reverse_length_list=list(reversed(new_length_list1))
