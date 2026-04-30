@@ -41,52 +41,6 @@ def get_geodesic_from_two_points(z1,z2):
     r=mpmath.sqrt((x1-xc)**2+y1**2)
     return (xc,r)
 
-def from_one_coordinate_to_the_next(c1,r1,p1,l2):
-    
-    r2=p1.imag*r1/abs(c1-p1.real)
-    c2=c1-r1**2/(c1-p1.real)
-    #sign=(c1-p1.real)/abs(c1-p1.real)
-    #sign=1
-    if abs(c1)<1e-10 and r1 >1.2:
-        return [0,0,r1*mpmath.exp(-l2)*1j]
-
-    else:
-        p2=from_endpoint_to_next(c1,r1,p1,mpmath.pi/2,l2)
-        cc=p2.real
-        cc1=p2.imag
-        if r1>10000 and cc>0:
-            p3=-cc+cc1*1j
-            return [r2,c2,p3]
-        return[r2,c2,p2]
-
-def from_endpoint_to_next_geodesic(c1,r1,p1,the1):
-    if p1.real<=c1:
-        the2=mpmath.atan((c1-p1.real)/p1.imag)
-        c2=p1.real+p1.imag*mpmath.tan(the1+the2)
-        r2=abs(p1.imag/(mpmath.cos(the1+the2)))
-        return [c2,r2]
-    else:
-        the2=mpmath.atan((p1.real-c1)/p1.imag)
-        c2=p1.real-p1.imag*mpmath.tan(the1+the2)
-        r2=abs(p1.imag/(mpmath.cos(the1+the2)))
-        return [c2,r2]
-
-def from_geodesic_to_next_point(c2,r2,p1,l2,index):
-  
-    if index==1:
-        the1=mpmath.atan(p1.imag/(p1.real-c2))+mpmath.pi
-        tan_the2_2=mpmath.exp(l2)*mpmath.tan(the1/2)
-        sin_the2_2=tan_the2_2/mpmath.sqrt(1+tan_the2_2**2)
-        cos_the2_2=1/mpmath.sqrt(1+tan_the2_2**2)
-        p2=c2+r2*(2*cos_the2_2**2-1)+2*r2*cos_the2_2*sin_the2_2*1j
-    if index==2:
-        the1=mpmath.atan(p1.imag/(p1.real-c2))+mpmath.pi
-        tan_the2_2=mpmath.exp(-l2)*mpmath.tan(the1/2)
-        sin_the2_2=tan_the2_2/mpmath.sqrt(1+tan_the2_2**2)
-        cos_the2_2=1/mpmath.sqrt(1+tan_the2_2**2)
-        p2=c2+r2*(2*cos_the2_2**2-1)+2*r2*cos_the2_2*sin_the2_2*1j
-    return p2
-
 def from_endpoint_to_next(c1,r1,p1,thee1,l2):
     M2=mpmath.matrix([[mpmath.cos(mpmath.pi-thee1)+1, -mpmath.exp(l2)*mpmath.sin(thee1)], [mpmath.sin(thee1), mpmath.exp(l2)*(mpmath.cos(mpmath.pi-thee1)+1)]])
     p2_2=(M2[0,0]*1j+M2[0,1])/(M2[1,0]*1j+M2[1,1])
