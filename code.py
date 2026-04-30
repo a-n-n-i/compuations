@@ -1147,7 +1147,7 @@ def if_adjacent_to_stratum(critical_point, curves_set,M1,M2,M3):
         dd2.append(bb)
     Length_approxi=[]
     t=0.1
-    epsilen=1e-4
+    epsilen=1e-5
 
 
     
@@ -1164,14 +1164,14 @@ def if_adjacent_to_stratum(critical_point, curves_set,M1,M2,M3):
         m.addConstr(Length_approxi[LL[i]]-Length_approxi[LL[i+1]]>=-epsilen)
 
     #---------------------------------------------
-    m.addConstr(np.dot(v1,D[:,LL[0]])<=-0.1)
+    m.addConstr(np.dot(v1,D[:,LL[0]])<=0)
     
     for i in range(len(LL1)):
         #print(LL[i+1])
         #print(np.dot(v1,D[:,LL[i]]))
         1
         #
-        m.addConstr(Length_approxi[LL1[i]]>=0.001+Length_approxi[LL[0]])
+        m.addConstr(Length_approxi[LL1[i]]>=0.0001+Length_approxi[LL[0]])
     
     
  
