@@ -7,13 +7,44 @@ from gurobipy import Model, GRB, quicksum
 import pickle
 import mpmath as mp
 
+# ============================================================================
+# Auxiliary Geometric Functions: Hyperbolic Geometry Calculations
+# These functions implement fundamental geometric operations in hyperbolic plane
+# for constructing the parameterization of the Techmuller space
+# ============================================================================
+
+
 
 def distance_between_points(w,z):
+    """
+    Calculate hyperbolic distance between two points in the upper half-plane model.
+    
+    Uses the formula: log(|w̅ - z| + |w - z|) - log(|w̅ - z| - |w - z|)
+    where w̅ denotes the complex conjugate of w.
+    
+    Args:
+        w, z: Complex numbers representing points in the upper half-plane
+        
+    Returns:
+        Hyperbolic distance between w and z
+    """
     dom=abs(w.conjugate()-z)+abs(w-z)
     num=abs(w.conjugate()-z)-abs(w-z)
     return mpmath.log(dom/num)
 
 def distance_between_semicircle_and_semicircle(c1,r1,c2,r2):
+    """
+    Calculate hyperbolic distance between two semicircles (representing geodesics).
+    
+    Used for computing distances between different edges of the Bolza surface.
+    
+    Args:
+        c1, r1: Center and radius of first semicircle
+        c2, r2: Center and radius of second semicircle
+        
+    Returns:
+        Hyperbolic distance between the two semicircles
+    """
     if c1!=c2:
         cx=(r2**2-r1**2+c1**2-c2**2)/(2*(c1-c2))
         r=mpmath.sqrt((c1-cx)**2-r1**2)
@@ -25,14 +56,20 @@ def distance_between_semicircle_and_semicircle(c1,r1,c2,r2):
     if c1==c2:
         return distance_between_points(r1*1j,r2*1j)
 #print(distance_between_semicircle_and_semicircle(0,1,0,2))
-def distance_between_semicircle_and_line(c1,c2,r2):
-    r=mpmath.sqrt((c1-c2)**2-r2**2)
-    p1=c1+r*1j
-    p2=(r2**2/(c1-c2)+c2)+(r*r2/abs(c2-c1))*1j
-    return distance_between_points(p1,p2)
-#print(distance_between_semicircle_and_line(0,-3,1))
+
 
 def get_geodesic_from_two_points(z1,z2):
+    """
+    Find the center and radius of the geodesic (semicircle) passing through two points.
+    
+    Used for constructing the 12-gon representation of the Bolza surface.
+    
+    Args:
+        z1, z2: Complex numbers representing points in the upper half-plane
+        
+    Returns:
+        Tuple (center, radius) of the geodesic semicircle
+    """
     x1=z1.real
     y1=z1.imag
     x2=z2.real
@@ -42,6 +79,21 @@ def get_geodesic_from_two_points(z1,z2):
     return (xc,r)
 
 def from_endpoint_to_next(c1,r1,p1,thee1,l2):
+    """
+    Transform from one endpoint to the next along the polygon boundary.
+    
+    Implements Möbius transformations corresponding to rotations and scalings
+    along the edges of the 12-gon.
+    
+    Args:
+        c1, r1: Center and radius of current geodesic
+        p1: Current endpoint
+        thee1: Angle parameter
+        l2: Length parameter
+        
+    Returns:
+        Next endpoint coordinates
+    """
     M2=mpmath.matrix([[mpmath.cos(mpmath.pi-thee1)+1, -mpmath.exp(l2)*mpmath.sin(thee1)], [mpmath.sin(thee1), mpmath.exp(l2)*(mpmath.cos(mpmath.pi-thee1)+1)]])
     p2_2=(M2[0,0]*1j+M2[0,1])/(M2[1,0]*1j+M2[1,1])
     #print(p2_2)
@@ -53,11 +105,35 @@ def from_endpoint_to_next(c1,r1,p1,thee1,l2):
     return p2
 
 def get_intersection_between_two_geodesics(c1,r1,c2,r2):
+    """
+    Calculate intersection point of two hyperbolic geodesics (semicircles).
+    
+    Used for determining intersections between different strata of the Bolza surface.
+    
+    Args:
+        c1, r1: Center and radius of first geodesic
+        c2, r2: Center and radius of second geodesic
+        
+    Returns:
+        Complex number representing intersection point
+    """
     x=(1/2)*((r1**2-r2**2)/(c2-c1)+c1+c2)
     y=abs(mpmath.sqrt(r1**2-(x-c1)**2))
     return x+y*1j
 
 def find_angle(p,p1,p2):
+    """
+    Calculate the angle at point p between the geodesics to p1 and p2.
+    
+    Used for computing interior angles of the 12-gon vertices.
+    
+    Args:
+        p: Vertex point where angle is measured
+        p1, p2: Points defining the two geodesics
+        
+    Returns:
+        Angle in radians at point p
+    """
     [c1,r1]=get_geodesic_from_two_points(p,p1)
     x0=p.real
     y0=p.imag
@@ -71,30 +147,60 @@ def find_angle(p,p1,p2):
     return mpmath.pi/2+the1
 
 
+# ============================================================================
+# Core Function: Compute Lengths of All Systoles on Bolza Surface
+# This implements the parameterization algorithm described in the README
+# ============================================================================
 
 
 
 def length_of_curves(x,initial=[0,0,0]):
-    mpmath.mp.dps = 300
+    """
+    Compute lengths of all 12 systoles for the Bolza surface at given parameters.
     
-    a=mpmath.acosh(mpmath.csc(mpmath.pi/8)/2)
+    Mathematical Background:
+    According to Reference [1], cutting the Bolza surface along a 4-chain yields
+    a 12-gon. Parameterizing this polygon requires 3 angle parameters and 6 edge
+    length parameters. Given any 6 parameters, the remaining 3 can be determined
+    numerically through closure conditions.
+    
+    Args:
+        x: 6-dimensional parameter vector [l0, l1, l2, the0, the1, the2]
+           - l0, l1, l2: Three free edge length parameters
+           - the0, the1, the2: Three free angle parameters
+        initial: Initial guess for numerical solver
+        
+    Returns:
+        length_systole_list_ordered: List of 12 systole lengths in order
+        
+    """
+    mpmath.mp.dps = 300  # Set high precision for numerical stability
+    
+    # Base geometric parameters of Bolza surface
+    a=mpmath.acosh(mpmath.csc(mpmath.pi/8)/2)  
     L=2*a
-    m4=3
+    m4=3  # Corresponds to 12-gon structure
+    # Base systole lengths and angles
     length_list=[1,2,1,1,2,1,1,2,1,1,2,1]
     for i in range(len(length_list)):
         length_list[i]=length_list[i]*L
     angle_list=[3,1,3,1,3,1,3,1,3,1,3,1]
     for i in range(len(angle_list)):
         angle_list[i]=angle_list[i]*mpmath.pi/4
-
+        
+    # Edge pairing relations in the 12-gon
     Pairs=[[6,8],[0,2],[1,7],[10,4],[3,5],[11,9]]
+    # Color grouping for identifying different systole collections
     color_pairs=[[0,1],[2],[3],[4,5]]
-    direction=[1,2,4]
+    
+    # Direction markers: which parameters are free vs dependent
+    direction=[1,2,4]    # Indices of free parameters
     all_direction=[]
     for i in range(2*m4):
         if i not in direction:
             all_direction.append(i)
-
+            
+    # Numerical solver tolerances and limits
     Epsilen=mpmath.mpf('1e-60')
     M1=mpmath.matrix([[1, 0], [0, 1]])
     C=M1
@@ -109,17 +215,27 @@ def length_of_curves(x,initial=[0,0,0]):
     LL4=[[2,8],[5,11],[2,5,11,8]]
     tolerance = mpmath.mpf('1e-200')    
     max_steps = 10000000000
+    
+    # Extract free parameters
     l0=x[0]
     l1=x[1]
     l2=x[2]
     the0=x[3]
     the1=x[4]
     the2=x[5]    
-    
+    # Angle grouping
     Angles=[[10,9,4,3],[11,8,5,2],[0,7,6,1]]
     
     Epsilen4=1e-120  
     def equations2(y0,y1,y2):
+        """
+        Define closure conditions for the 12-gon.
+        
+        The 12-gon must close on itself, which provides constraints on the
+        dependent parameters. This implements the numerical solving part
+        mentioned in the README.
+        """
+        
         theta1 = [ angle_list[Angles[i][0]] for i in range(m4)] 
         theta1[0]=theta1[0]+the0
         theta1[1]=theta1[1]+the1
@@ -141,12 +257,15 @@ def length_of_curves(x,initial=[0,0,0]):
         for i in range(m4*2):
             x[Pairs[i][0]]=z[i]
             x[Pairs[i][1]]=z[i]
+
+        # Build complete transformation matrix and check closure condition
         C=M1
         for i in range(4*m4):
         #M2=(1/(2*x[i]))**(1/2)*np.array([[1, -x[i]], [1, x[i] ]])
             M2=mpmath.matrix([[-mpmath.cos(theta[i])+1, -mpmath.exp(length_list[i]+x[i])*mpmath.sin(theta[i])], [mpmath.sin(theta[i]), mpmath.exp(length_list[i]+x[i])*(-mpmath.cos(theta[i])+1)]])       
             C=M2*C
             #print(M2*M1)
+        # Closure condition: the resulting matrix should be Indentity matrix in PSL(2,R)
         eqcons2=[]
         eqcons2.append(C[0,0]/C[1,1]-1)
         eqcons2.append(C[0,1]/C[1,1])
@@ -159,11 +278,8 @@ def length_of_curves(x,initial=[0,0,0]):
         solution = [solution[i] for i in range(solution.rows * solution.cols)]
     else:
         solution = solution
-    solution1=solution
-    
-    #print("new solution",solution)
+
     length_systole_list= [mpmath.mpf(0) for _ in range(int(4*m4))]
-    #color_pairs=[[0,1],[2],[3],[4,5]]
     length_edge_list=[mpmath.mpf(0) for _ in range(int(2*m4))]
     length_edge_list[all_direction[0]]=length_list[Pairs[all_direction[0]][0]]+l0
     length_edge_list[all_direction[1]]=length_list[Pairs[all_direction[1]][0]]+l1
