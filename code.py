@@ -319,7 +319,7 @@ def length_of_curves(x,initial=[0,0,0]):
         theta[Angles[i][2]]=theta1[i]
         theta[Angles[i][3]]=mpmath.pi-theta1[i]
     #theta[1]=mpmath.pi-theta[1]
-#theta[2]=mpmath.pi-theta[2]
+    #theta[2]=mpmath.pi-theta[2]
     M2=mpmath.matrix([[mpmath.cos(mpmath.pi-theta[4*m4-1])+1, -mpmath.exp(reverse_length_list[0])*mpmath.sin(mpmath.pi-theta[4*m4-1])], [mpmath.sin(mpmath.pi-theta[4*m4-1]), mpmath.exp(reverse_length_list[0])*(mpmath.cos(mpmath.pi-theta[4*m4-1])+1)]])
     co1=(M2[0,0]*1j+M2[0,1])/(M2[1,0]*1j+M2[1,1])
     p1=mpmath.mpc(1j)
@@ -354,7 +354,7 @@ def length_of_curves(x,initial=[0,0,0]):
     for j in range(len(length_list)-1):
         coordinate_list1.append(coordinate_list[len(length_list)-j-1])
     
-
+    #the next is to compute the length of closed curves in C which are in the inner of the 12-gon, see more about this algrithm in the paper 
     for i in range(len(L3)):
         n=int(len(L3[i])/2)
         if n==1:
@@ -721,9 +721,25 @@ def length_of_curves(x,initial=[0,0,0]):
     #L_A_C_x= length_systole_list_ordered[11]#+length_systole_list_ordered[1]+length_systole_list_ordered[6]+length_systole_list_ordered[7]+length_systole_list_ordered[8]
     #print(length_systole_list)
     return  length_systole_list_ordered
-#==========================================================
-
+# ============================================================================
+# Length Function: Linear Combination of Systole Lengths
+# Used for convex optimization problems described in README
+# ============================================================================
 def length_function(x,initial,coef):
+    """
+    Compute linear combination of systole lengths with given coefficients.
+    
+    Args:
+        x: 6-dimensional parameter vector
+        initial: Initial guess for numerical solver
+        coef: List of 12 coefficients (one for each systole)
+        
+    Returns:
+        Value of the linear combination of systole lengths
+        
+    Example from README:
+        To compute ∑_{i=1}^{12} L(c_i), set coef=[1,1,...,1]
+    """
     # coef is a list with 12 entries
     l=0
     all_length=length_of_curves(x,initial)
@@ -732,9 +748,24 @@ def length_function(x,initial,coef):
     return l
 
 
-#==========================================================
-
+# ============================================================================
+# Find Initial Guess: For Numerical Solver
+# Simplified version of the numerical solving part in length_of_curves
+# ============================================================================
 def find_initial(x,initial):
+    """
+    Find initial guess for numerical solver used in length_of_curves.
+    
+    This is a simplified version of the numerical solving procedure
+    described in the README for finding dependent parameters.
+    
+    Args:
+        x: 6-dimensional parameter vector
+        initial: Initial guess for numerical solver
+        
+    Returns:
+        List of 3 dependent parameters
+    """
     l0=x[0]
     l1=x[1]
     l2=x[2]
@@ -743,7 +774,6 @@ def find_initial(x,initial):
     the2=x[5]    
     m4=3
     mpmath.mp.dps = 300
-    
     a=mpmath.acosh(mpmath.csc(mpmath.pi/8)/2)
     L=2*a
     Angles=[[10,9,4,3],[11,8,5,2],[0,7,6,1]]
@@ -769,8 +799,6 @@ def find_initial(x,initial):
     for i in range(4*m4):
         M2=mpmath.matrix([[-mpmath.cos(angle_list[i])+1, -mpmath.exp(length_list[i])*mpmath.sin(angle_list[i])], [mpmath.sin(angle_list[i]), mpmath.exp(length_list[i])*(-mpmath.cos(angle_list[i])+1)]])
         C=M2*C
-
-
     def equations2(y0,y1,y2):
         theta1 = [ angle_list[Angles[i][0]] for i in range(m4)] 
         theta1[0]=theta1[0]+the0
@@ -809,7 +837,10 @@ def find_initial(x,initial):
     if isinstance(solution, mpmath.matrix):
         solution = [solution[i] for i in range(solution.rows * solution.cols)]
     return [solution[0],solution[1],solution[2]]
-#==========================================================
+# ============================================================================
+# Gradient Descent Algorithm: Find Minimum of Length Function
+# Corresponds to gradient_descent_convex in README
+# ============================================================================
 
 def gradient_descent_convex(
     func,
@@ -821,10 +852,33 @@ def gradient_descent_convex(
     tol=1e-6,            
     h=1e-10               
 ):
+    """
+    Use gradient descent to find minimum of a convex function.
+    
+    Args:
+        func: Function to minimize (typically length_function)
+        coef: Coefficients for the length function
+        initial_params: Initial parameter guess
+        initial: Initial guess for numerical solver
+        learning_rate: Step size for gradient descent
+        max_iter: Maximum number of iterations
+        tol: Convergence tolerance
+        h: Step size for numerical gradient computation
+        
+    Returns:
+        Optimal parameters and corresponding function value
+        
+    Implementation Notes:
+    1. Uses central difference for numerical gradient computation
+    2. Checks convergence based on gradient norm
+    3. Updates parameters using gradient descent rule
+    4. Updates initial guess for numerical solver at each iteration
+    """
     #initial=[3.801742890806985e-05, -1.528568965361195, -0.00011738469426353445]
     theta = initial_params 
     for iter_idx in range(max_iter):
         grad=[0,0,0,0,0,0]
+        # Numerical gradient computation using central differences
         for j in range(len(theta)):  
             theta_plus = theta.copy()
             theta_plus[j] += h
@@ -832,23 +886,23 @@ def gradient_descent_convex(
             theta_minus[j] -= h
             #print("theta_plus",theta_plus)
             grad[j] = (func(theta_plus,initial,coef) - func(theta_minus,initial,coef)) / ( 2*h)
-        
+        # Check convergence
         if np.linalg.norm(grad) < tol:
             print("grad",grad)
             print(f"迭代 {iter_idx + 1} 次后收敛")
             break
+        # Check convergence
         if iter_idx%10==0:
-
             theta1=[float(a) for a in theta]
             print("theta",theta1)
             grad1=[float(a) for a in grad]
             print("grad",grad1)
+        # Update parameters using gradient descent
         for i in range(6):
             theta[i] = theta[i]-learning_rate *(grad[i])#*(abs(grad[i]))**(1/10)
-        #theta -= learning_rate * grad
-        #print("theta",theta)
-        #print("initial",initial)
+        # Update initial guess for numerical solver
         initial=find_initial(theta,initial)
+        # Print function value every 10 iterations
         if iter_idx%10==0:
             initial1=[float(a) for a in initial]
             print("new_initial",initial1)
@@ -871,9 +925,25 @@ min_params, min_value = gradient_descent_convex(
     max_iter=10000,
     tol=1e-15
 )
-#==========================================================
-
+# ============================================================================
+# Automorphism Group Calculation: Corresponds to README function
+# automorphism_group_quotient_hyperelliptic_involution
+# ============================================================================
 def automorphism_group_quotient_hyperelliptic_involution(critical_point,orientation):
+    """
+    Compute automorphism group of quotient space (modulo hyperelliptic involution).
+    
+    Args:
+        critical_point: Type of critical point (12, 9, 6, or 5)
+        orientation: Orientation preservation (0: all automorphisms, 1: orientation-preserving only)
+        
+    Returns:
+        List of group elements (each element is a permutation of systoles)
+        
+    Mathematical Background:
+    For each critical point (B, M_9^1, M_6^1, M_5^1), this computes the
+    automorphism group of the quotient surface modulo the hyperelliptic involution.
+    """
     def get_group_from_generators(generators, set_of_systoles):
         group=[]
         for i in range(len(generators)):
@@ -950,13 +1020,24 @@ def automorphism_group_quotient_hyperelliptic_involution(critical_point,orientat
                     [4,5,1,2,3]
              ]
         return get_group_from_generators(generators,[1,2,11,7,5])
-#==========================================================
-
-        
-
-from gurobipy import Model, GRB
-import numpy as np
+# ============================================================================
+# Minimum Point Detection: Corresponds to README function if_in_a_minima
+# ============================================================================
 def if_in_a_minima(diff_matrix, curves_set):
+     """
+    Determine whether a given point is a local minimum.
+    
+    Uses Gurobi to solve a linear programming feasibility problem
+    checking if the gradient is zero within tolerance.
+    
+    Args:
+        diff_matrix: Differential matrix at the point
+        curves_set: List representing a subset of systoles C
+        
+    Returns:
+        1: Point is a local minimum
+        0: Point is not a local minimum
+    """
     n = len(curves_set)
     m = Model("feas_qcqp")
     m.setParam("OutputFlag", 0)          # 0 为静默
@@ -988,8 +1069,19 @@ def if_in_a_minima(diff_matrix, curves_set):
         return 0
    
         return 0
-      
+# ============================================================================
+# Second Derivative Calculation: Corresponds to README get_second_differential
+# ============================================================================    
 def get_second_differential(critical_point):
+    """
+    Compute second derivative matrix of length function using numerical differentiation.
+    
+    Args:
+        critical_point: Type of critical point (12, 9, 5)
+        
+    Returns:
+        Second derivative matrix
+    """
     if critical_point==12:
         systoles=[1,2,3,4,5,6,7,8,9,10,11,12]
         parameter=[0,0,0,0,0,0]
@@ -1048,8 +1140,19 @@ def get_second_differential(critical_point):
             print(LE)
             print("---------------------------")
     return MM2
-
+# ============================================================================
+# Third Derivative Calculation: Corresponds to README get_third_differential
+# ============================================================================
 def get_third_differential(critical_point):
+    """
+    Compute third derivative tensor of length function using numerical differentiation.
+    
+    Args:
+        critical_point: Type of critical point (12, 9, 5)
+        
+    Returns:
+        Third derivative tensor
+    """
     if critical_point==12:
         systoles=[1,2,3,4,5,6,7,8,9,10,11,12]
         parameter=[0,0,0,0,0,0]
@@ -1142,10 +1245,26 @@ def get_third_differential(critical_point):
                 print("---------------------------")
     return MM3
 
-#==========================================================
-
+# ============================================================================
+# Stratum Adjacency Detection: Corresponds to README if_adjacent_to_stratum
+# ============================================================================
 
 def if_adjacent_to_stratum(critical_point, curves_set,M1,M2,M3):
+   """
+    Check if a stratum is adjacent to the critical points B, M_9^1, M_5^1.
+    
+    Uses Gurobi to solve a linear programming feasibility problem
+    involving first, second, and third derivatives.
+    
+    Args:
+        critical_point: Type of critical point (12, 9, or 5)
+        curves_set: List representing a subset of systoles C
+        M1, M2, M3: First, second, and third derivatives at critical points
+        
+    Returns:
+        1: Stratum is adjacent
+        0: Stratum is not adjacent
+    """
     mm=critical_point
     D=np.zeros((6,mm))
     for i in range(6):
