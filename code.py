@@ -149,7 +149,7 @@ def find_angle(p,p1,p2):
 
 # ============================================================================
 # Core Function: Compute Lengths of All Systoles on Bolza Surface
-# This implements the parameterization algorithm described in the README
+# This implements the parameterization algorithm described in the paper
 # ============================================================================
 
 
@@ -157,7 +157,6 @@ def find_angle(p,p1,p2):
 def length_of_curves(x,initial=[0,0,0]):
     """
     Compute lengths of all 12 systoles for the Bolza surface at given parameters.
-    
     Mathematical Background:
     According to Reference [1], cutting the Bolza surface along a 4-chain yields
     a 12-gon. Parameterizing this polygon requires 3 angle parameters and 6 edge
@@ -354,7 +353,8 @@ def length_of_curves(x,initial=[0,0,0]):
     for j in range(len(length_list)-1):
         coordinate_list1.append(coordinate_list[len(length_list)-j-1])
     
-    #the next is to compute the length of closed curves in C which are in the inner of the 12-gon, see more about this algrithm in the paper 
+    #$\mathcal{C}$:=\{all geodesics connecting $l_1$ and $l_2$ that form closed geodesics\}  \Comment{ where $l_1$ and $l_2$ are the pair of edges of the 12-gon corresponding to same systole
+    # Solve: $d\text{length} (l)=0$ for l in  
     for i in range(len(L3)):
         n=int(len(L3[i])/2)
         if n==1:
@@ -596,12 +596,10 @@ def length_of_curves(x,initial=[0,0,0]):
                 new_length_list1.append(new_length_list[kk])'''
             #print([new_length_list,new_angle_list1])
             return [new_length_list,new_angle_list1]
-    #LL=[[1,7],[2,11],[8,9],[9,8],[11,2],[7,1]]
-    #FF=[[1,3],[2,4],[3,1],[4,2]]
-    #index=1
-    #print("----------------")
-    #print(get_length_and_angle_list(LL,FF,index))
 
+    # the next is doing things like this:
+    # Cut $S_2$ along $c_1,c_2,c_6,c_7$: we can get new 6 length parameters and 3 angle parameters, use these parameters, slove $\text{length}(c_{9})$
+    # Repeat the above: solve all curve lengths in C
     def get_extra_length(AA,index):
         new_length_list=AA[0]
         new_angle_list =AA[1]
@@ -611,7 +609,6 @@ def length_of_curves(x,initial=[0,0,0]):
         coordinate_list=[]
         coordinate_list.append(1j)
         reverse_length_list=list(reversed(new_length_list1))
-       # list(reversed(new_length_list1[k,:]))
         M2=mpmath.matrix([[mpmath.cos(mpmath.pi-theta[4*m4-1])+1, -mpmath.exp(reverse_length_list[0])*mpmath.sin(mpmath.pi-theta[4*m4-1])], [mpmath.sin(mpmath.pi-theta[4*m4-1]), mpmath.exp(reverse_length_list[0])*(mpmath.cos(mpmath.pi-theta[4*m4-1])+1)]])
         co1=(M2[0,0]*1j+M2[0,1])/(M2[1,0]*1j+M2[1,1])
         p1=mpmath.mpc(1j)
