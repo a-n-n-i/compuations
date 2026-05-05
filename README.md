@@ -23,10 +23,10 @@ The code runs in both Python and SageMath. It requires the installation of Gurob
 ```sh
 pip install gurobipy
 ```
-Below are explanations of the functions and their usage: 
+Below are explanations of the functions and their usage. The parameter `precision` in the following code is used to set the computational precision. The larger the `precision`, the higher the computational accuracy, but the slower the computation speed.
 ### 1. length_of_curves
  ```sh
-length_of_curves(x, initial=[0,0,0])
+length_of_curves(x, initial=[0,0,0],precision)
 # x is a list representing a 6-dimensional coordinate vector representing a point in Teichmüller space
 # initial is a list of initial guess for the numerical solver. Default is [0,0,0]
    ```
@@ -34,12 +34,13 @@ length_of_curves(x, initial=[0,0,0])
 **Example Usage:** compute the length of curves in C at Bolza surface 
 ```sh
 initial=[0,0,0] 
-parameters=[0,0,0,0,0,0]  
-print(length_of_curves(parameters, initial))
+parameters=[0,0,0,0,0,0]
+precision=40  
+print(length_of_curves(parameters, initial,precision))
 ```
 ### 2. differential_of_curves
  ```sh
-differential_of_curves(x, initial)
+differential_of_curves(x, initial,precision)
 # x is a list representing a 6-dimensional coordinate vector representing a point in Teichmüller space
 # initial is a list of initial guess for the numerical solver. Default is [0,0,0]
    ```
@@ -47,13 +48,14 @@ differential_of_curves(x, initial)
 **Example Usage:** compute the differentials of length of curves in C at Bolza surface
 ``` sh
 initial=[0,0,0] 
-parameters=[0,0,0,0,0,0]  
-print(differential_of_curves(parameters, initial))
+parameters=[0,0,0,0,0,0]
+precision=40
+print(differential_of_curves(parameters, initial,precision))
 ```
 ### 3. length_function
 Computes the sum of the positive linear combination of the lengths of curves in C at point x.
 ```sh
-length_function(x,initial,coef)
+length_function(x,initial,coef,precision)
 # x is a list representing a 6-dimensional coordinate vector representing a point in Teichmüller space
 # initial is a list of initial guess for the numerical solver. Default is [0,0,0]
 # coef is a list of coefficients for this positive linear combination.
@@ -63,8 +65,9 @@ length_function(x,initial,coef)
 ```sh
 initial=[0,0,0]  
 parameters=[0,0,0,0,0,0]  
-coef=[1,1,1,1,1,1,1,1,1,1,1,1]  
-print(length_function(parameters, initial,coef))
+coef=[1,1,1,1,1,1,1,1,1,1,1,1]
+precision=40  
+print(length_function(parameters, initial,coef,precision))
 ```
 ### 4. gradient_descent_convex
 use gradient descent method to compute the minimum of a length function
@@ -77,19 +80,21 @@ gradient_descent_convex(
     learning_rate,         # Learning rate (step size)
     max_iter=10000,        # aximum number of iterations (prevents infinite loops)
     tol=1e-6,              # Convergence tolerance (stops when gradient norm is below this value)
-    h=1e-10                # Small step size for numerical gradient computation
+    h=1e-10,                # Small step size for numerical gradient computation
+    precison
 )  
 ```
-**Example Usage:** compute the minimum point of $\sum_{i=1}^{12}L(c_i)$
+**Example Usage:** compute the minimum point of $L(c_1)+L(c_2)+L(c_8)+L(c_9)$
 ```sh
-min_params, min_value = gradient_descent_convex(  
-    func=length_function,
-    coef=[1,1,1,1,1,1,1,1,1,1,1,1],  
-    initial_params=initial_guess,
-    initial=[3.801742890806985e-05, -1.528568965361195, -0.00011738469426353445],    
+min_params, min_value = AllFunctions.gradient_descent_convex(  
+    func=AllFunctions.length_function,
+    coef=[1,1,0,0,0,0,0,1,1,0,0,0],  
+    initial_params=[0,0,0,0,0,0],
+    initial=[0,0,0],    
     learning_rate= 0.003,  
     max_iter=10000,  
-    tol=1e-15  
+    tol=1e-15 ,
+    precision=40 
 )  
 ```
 ### 5. automorphism_group_quotient_hyperelliptic_involution
