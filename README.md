@@ -177,7 +177,7 @@ print(if_adjacent_to_stratum(12, [1,2,7,8,9,11],MM,MM2,MM3))
 2. 
 
 ## 5. Contact
-For questions, bug reports, please contact: **Ni An**, Southern University of Science and Technology (SUSTech). Email: [12231265@mail.sustech.edu.cn](mailto:12231265@mail.sustech.edu.cn)                                                          
+For questions, bug reports, please contact: **Ni An**, Southern University of Science and Technology (China). Email: [12231265@mail.sustech.edu.cn](mailto:12231265@mail.sustech.edu.cn)                                                          
 ## 6. Appendix
 **$M_{12}$**
 ```sh
