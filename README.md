@@ -18,6 +18,8 @@ The implementation is structured around the following computational tasks:
 5. Determine whether a given point is in a minima.
 
 ## 3. Mathematical principle and algrithm
+
+### Computation of differential of length function
 A filling subset of $C$ must contain at least four curves. Cutting the surface along a 4-chain yields a 12-gon. According to \cite{An14052026}, parameterizing the surface via this polygon requires three angle parameters and six edge length parameters. Given any six parameters, the remaining three can be determined numerically by the equation:
 M₁₂ · M₁₁ · … · M₁ = I in PSL(2, ℝ),
 where $M_i$ are matrices determined by the length parameters and angle parameters.
@@ -51,6 +53,8 @@ Cut surface S₂ along curves c₁, c₂, c₆, c₇:
 Repeat steps 1–4 to compute all curve lengths in C
 ```
 
+
+### Compute the minimum point
 However, numerical root-finding requires initial guesses within a reasonable error bound. We can minimize the convex objective $\sum_{i=1}^{12} a_i L(c_i)$ via gradient descent (algorithm`gradient_descent`). In the **Appendix**, I provide pre-computed data: six fixed parameters for specific points and the corresponding three dependent parameters solved from them. Additionally, you can use the gradient descent function described below to compute parameters for new points.
 ```text
 Algorithm: GradientDescent(f, coef, θ⁽⁰⁾, init₀, η, M, τ, h)
