@@ -20,7 +20,7 @@ The implementation is structured around the following computational tasks:
 ## 3. Mathematical principle and algrithm
 
 ### Computation of differential of length function
-A filling subset of $C$ must contain at least four curves. Cutting the surface along a 4-chain yields a 12-gon. According to \cite{An14052026}, parameterizing the surface via this polygon requires three angle parameters and six edge length parameters. Given any six parameters, the remaining three can be determined numerically by the equation:
+A filling subset of $C$ must contain at least four curves. Cutting the surface along a 4-chain yields a 12-gon. According to [1], parameterizing the surface via this polygon requires three angle parameters and six edge length parameters. Given any six parameters, the remaining three can be determined numerically by the equation:
 M₁₂ · M₁₁ · … · M₁ = I in PSL(2, ℝ),
 where $M_i$ are matrices determined by the length parameters and angle parameters.
 
