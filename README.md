@@ -189,7 +189,7 @@ set of systoles of $M_5^1$ is $(c_1,c_2,c_{11},c_7,c_{5} )$
 ```sh
 automorphism_group_quotient_hyperelliptic_involution(critical_point,orientation)
 #critical_point: int, choices are 12, 9, 6, or 5.
-#corresponds to the quotient of the automorphism group of $B, M_9^1, M_6^1, M_5^1$ by the hyperelliptic involution.
+#corresponds to the quotient of the automorphism group of $M_{12}, M_9^1, M_6^1, M_5^1$ by the hyperelliptic involution.
 # orientation: int, choices are 0 or 1. 0 means both orientation-preserving and non-orientation-preserving automorphisms;
 # 1 means only orientation-preserving automorphisms.
 ```
@@ -217,7 +217,7 @@ print(if_in_a_minima(diff_matrix, curves_set))
 # 1 -- The point is the minima.
 ```
 ### 7. if_adjacent_to_stratum
-check if a stratum is adjacent to the critical points $B, M_9^1, M_5^1$ using third derivatives. 
+check if a stratum is adjacent to the critical points $M_{12}, M_9^1, M_5^1$ using third derivatives. 
 ```sh
 if_adjacent_to_stratum_3order(critical_point, curves_set,M1,M2,M3)
 #critical_point: int, choices are 12, 9, or 5.
