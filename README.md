@@ -26,75 +26,7 @@ where $M_i$ are matrices determined by the length parameters and angle parameter
 
 Numerical root-finding requires initial guesses within a reasonable error bound. Specifically, for the algorithm in this paper, we cut the surface along $c_1, c_2, c_8, c_9$, resulting in a 12-gon $\mathcal{F}$ with 6 length parameters and 3 angle parameters. The algorithm for computing the lengths of all curves in $C$ using six of these parameters is as follows:
 
-```
-Algorithm: ComputeAllCurveLengthsInC(6_params, init_vals)
-
-Input:
-6 parameters of the 12-gon 𝓕
-init_vals: initial values for numerical solvers
-
-Output:
-All curve lengths in C
-
-Solve for the remaining 3 parameters of 𝓕 using Equation M₁₂ · M₁₁ · … · M₁ = I in PSL(2, ℝ)
-→ Now all parameters of the 12-gon are known, including lengths of c₁, c₂, c₈, c₉
-
-Compute length(c₇):
-Define 𝒞 := {all geodesics connecting l₁ and l₂ that form closed geodesics}
-where l₁ and l₂ are the pair of edges of 𝓕 corresponding to c₈
-Solve: d·length(l) = 0 for l ∈ 𝒞
-→ The minimal length obtained is length(c₇)
-
-Compute length(c₁₁) and length(c₆) similarly to step 2
-Cut surface S₂ along curves c₁, c₂, c₆, c₇:
-→ Obtain new set of 6 length parameters and 3 angle parameters
-→ Use these parameters to solve for length(c₉)
-
-Repeat steps 1–4 to compute all curve lengths in C
-```
-
-
-### Compute the minimum point
 However, numerical root-finding requires initial guesses within a reasonable error bound. We can minimize the convex objective $\sum_{i=1}^{12} a_i L(c_i)$ via gradient descent (algorithm`gradient_descent`). In the **Appendix**, I provide pre-computed data: six fixed parameters for specific points and the corresponding three dependent parameters solved from them. Additionally, you can use the gradient descent function described below to compute parameters for new points.
-```text
-Algorithm: GradientDescent(f, coef, θ⁽⁰⁾, init₀, η, M, τ, h)
-
-Input:
-  f        : objective function
-  coef     : coefficients aᵢ
-  θ⁽⁰⁾     : initial parameters
-  init₀    : initial values
-  η        : learning rate
-  M        : max iterations
-  τ        : tolerance
-  h        : finite difference step
-
-Output:
-  θ*       : optimized parameters
-  f(θ*)    : function value
-
-θ ← θ⁽⁰⁾
-for k = 0 … M−1:
-    ∇f(θ) ← zeros(6)
-
-    for j = 0 … 5:
-        θⱼ⁺ ← θⱼ + h
-        θⱼ⁻ ← θⱼ − h
-        ∇fⱼ(θ) ← (f(θ⁺, init, coef) − f(θ⁻, init, coef)) / (2h)
-
-    if ‖∇f(θ)‖ < τ:
-        break   // convergence achieved
-
-    for j = 0 … 5:
-        θⱼ ← θⱼ − η · ∇fⱼ(θ)
-
-    init ← find_initial(θ, init)
-
-if k = M and not converged:
-    warn("Maximum iterations reached")
-
-return θ, f(θ, init)
-```
 
 **Note:**  
 The function uses high-precision numerical optimization. If convergence fails, try adjusting the `initial` parameter closer to the expected solution.
