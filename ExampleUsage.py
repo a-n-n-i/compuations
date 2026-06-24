@@ -1,158 +1,47 @@
+initial =[0 ,0 ,0]
+parameters =[0 ,0 ,0 ,0 ,0 ,0]
+precision =10
+print ( length_of_curves ( parameters , initial , precision ) )
 
-import pickle
-import AllFunctions
-import itertools
-
-parameter=[-0.06285556753370763949511129726305908862772147851980580123171816356121368068899110013161906643192060040919404038442229618162633441934071541770622657966444780606, -0.125711135067415278990222594526118177255442957039611602463436327122427361377982200263238132863841200818388080768844592363252668838681430835412453159328895612133, -0.0628555675337076394951112972630590886277214785198058012317181635612136806889911001316190664319206004091940403844222961816263344193407154177062265796644478060665, -0.38434494644064063487056189797209379978236669557702368968774104897549973387195268100209120274560562286793771229689822066387339235522849676358499860365285874814014, 0.384344946440640634870561897972093799782366695577023689687741048975499733871952681002091202745605622867937712296898220663873392355228496763584998603652858748140147, -0.01670827051616703987453704987568812148455895868972907586825405012595463382764688765282630084431802125966159703452413533402667644193065203076134264472640278308227]
-initial=[-0.06285556753370763949511129726305908862772147851980580123171816356121368068899110013161906643192060040919404038442229618162633441934071541770622657966444780606657, -0.125711135067415278990222594526118177255442957039611602463436327122427361377982200263238132863841200818388080768844592363252668838681430835412453159328895612133152, -0.062855567533707639495111297263059088627721478519805801231718163561213680688991100131619066431920600409194040384422296181626334419340715417706226579664447806066576]
-#print(AllFunctions.length_of_curves(parameter, initial,50))
-
-
-parameter=[0,0,0,0,0,0]
-initial=[0,0,0]
-#print(AllFunctions.differential_of_curves(parameter, initial,50))
-#=================================================
-'''
-min_params, min_value = AllFunctions.gradient_descent_convex(  
-    func=AllFunctions.length_function,
-    coef=[1,1,0,0,0,0,0,1,1,0,0,0],  
-    initial_params=[0,0,0,0,0,0],
-    initial=[0, 0, 0],    
-    learning_rate= 0.003,  
-    max_iter=10000,  
-    tol=1e-15 ,
-    precision=40 
-)  
-'''
-#==================================================
-'''
-LL=AllFunctions. automorphism_group_quotient_hyperelliptic_involution(12,0)
-def combinations_k1k2(k1, k2):
-    if k1 <= 0 or k2 <= 0 or k1 < k2:
-        return []
-    
-    result = []
-    elements = list(range(k1))  
-    
-    def backtrack(start, path):
-        if len(path) == k2:
-            result.append(path.copy())
-            return
-        
-        for i in range(start, len(elements) - (k2 - len(path)) + 1):
-            path.append(elements[i])
-            backtrack(i + 1, path)  
-            path.pop()
-    
-    backtrack(0, [])
-    return result
-all_orbit=[]
-for k in range(13):
-    all_cases=combinations_k1k2(12, k)
-    orbit=[]
-    for v in all_cases:
-        ii=0
-        for gg in LL:
-
-            v1=[]
-            for i in range(len(v)):
-                v1.append(gg[v[i]]-1)
-            if sorted(v1) not in orbit:
-                ii=ii+1
-        #print(ii)
-        if ii==len(LL):
-            orbit.append(sorted(v))
-    #print(k)     
-    #print(orbit)
-    #print(len(orbit))
-    #print("-----------------")
-    all_orbit.append(orbit)
-
-all_orbit1=[]
-for L in all_orbit:
-    for v in L:
-        v1=[]
-        for a in v:
-            v1.append(a+1)
-        all_orbit1.append(v1)
-#print(all_orbit1)
-#print(combinations_k1k2(12, 11))
-'''
-
-def load_MM_pickle(file_name='D_12_1.pickle'):
-    with open(file_name, 'rb') as f:
-        return pickle.load(f)
-
-DD= load_MM_pickle()
-#print(DD)
-def load_MM2_pickle(file_name='D_12_2.pickle'):
-    with open(file_name, 'rb') as f:
-        return pickle.load(f)
-
-
-MM2 = load_MM2_pickle()
-#print(type(MM3_new[0][0][0][0])) 
-#print(MM2[2][0])
-def load_MM3_pickle(file_name='D_12_3.pickle'):
-    with open(file_name, 'rb') as f:
-        return pickle.load(f)
-
-MM3 = load_MM3_pickle()
-#print(type(MM3_new[0][0][0][0])) 
-#print(MM3[2][0])
-
-def load_MM4_pickle(file_name='D_12_4.pickle'):
-    with open(file_name, 'rb') as f:
-        return pickle.load(f)
-
-MM4 = load_MM4_pickle()
-
-def load_MM5_pickle(file_name='D_12_5.pickle'):
-    with open(file_name, 'rb') as f:
-        return pickle.load(f)
-MM5= load_MM5_pickle()
-#print(AllFunctions.if_adjacent_to_stratum(12,[1,2,3,8,9],DD,MM2,MM3,MM4, MM5))
-CC1=[]
-
-'''
-for LL1 in all_orbit1:
-    print(LL1)
-    #print(AllFunctions.if_adjacent_to_stratum(12,LL1,DD,MM2,MM3,MM4,MM5))
-    if AllFunctions.if_adjacent_to_stratum(12,LL1,DD,MM2,MM3)==1:
-        CC1.append(LL1)
-    print("---------------------------")
-
-#
-print(CC1)
-'''
-print("start")
-print(AllFunctions.if_adjacent_to_stratum_3order(12,[1,4,8,10,11],DD,MM2,MM3))
-print(AllFunctions.if_adjacent_to_stratum_5order(12,[1,4,8,10,11],DD,MM2,MM3,MM4,MM5))
-#=======================================
-
-'''
-def load_MM_pickle(file_name='D_9_1.pickle'):
-    with open(file_name, 'rb') as f:
-        return pickle.load(f)
-
-DD= load_MM_pickle()
-#print(DD)
-def load_MM2_pickle(file_name='D_9_2.pickle'):
-    with open(file_name, 'rb') as f:
-        return pickle.load(f)
-
-
-MM2 = load_MM2_pickle()
-#print(type(MM3_new[0][0][0][0])) 
-#print(MM2[2][0])
-def load_MM3_pickle(file_name='D_9_3.pickle'):
-    with open(file_name, 'rb') as f:
-        return pickle.load(f)
-
-MM3 = load_MM3_pickle()
-#print(type(MM3_new[0][0][0][0])) 
-#print(MM3[2][0])
-
-print(AllFunctions.if_adjacent_to_stratum(9, [1,2,3,6,8,9,12],DD,MM2,MM3))
-'''
-
+#=============================================================================
+with open ('D_12_1.pickle ', 'rb') as f :
+    M1 = pickle . load ( f ) #First - order derivative
+with open ('D_12_2.pickle', 'rb') as f :
+    M2 = pickle . load ( f ) #Second - order Hessian
+with open ('D_12_3.pickle', 'rb') as f :
+    M3 = pickle . load ( f ) #Third - order tensor
+with open ('D_12_4.pickle', 'rb') as f :
+    M4 = pickle . load ( f )
+with open ('D_12_5.pickle', 'rb') as f :
+    M5 = pickle . load ( f )
+#=============================================================================
+print(automorphism_group_quotient_hyperelliptic_involution(12,1))
+#=============================================================================
+G=automorphism_group_quotient_hyperelliptic_involution(12,0)
+all_orbit=get_orbits_of_subset_of_C_with_some_cardinality(12,G,4) #all_orbit is the set of all subset of C with cardinality 4 up to isomorphism, all_orbit[4] has four 4-chains:[1,2,5,7], [1,2,5,8], [1,2,5,11], [1,2,7,11]
+print(if_adjacent_to_stratum_3order(12,[1,2,5,7],M1,M2,M3))
+print(if_adjacent_to_stratum_3order(12,[1,2,5,11],M1,M2,M3))
+print(if_adjacent_to_stratum_3order(12,[1,2,7,11],M1,M2,M3))
+print(if_adjacent_to_stratum_3order(12,[1,2,5,8],M1,M2,M3)) #this takes hours
+#=============================================================================
+A_T=np.array([[0,0,2,0,0,0],
+	    [0,1,0,0,0,0],
+	    [2+np.sqrt(2),1+np.sqrt(2)/2,2+2*np.sqrt(2),-2*np.sqrt(1+np.sqrt(2)),2*np.sqrt(1+np.sqrt(2)),0],
+	    [-2-2*np.sqrt(2),-1,-2-2*np.sqrt(2),2*np.sqrt(2+2*np.sqrt(2)),0,2*np.sqrt(2+2*np.sqrt(2))],
+	    [2,0,0,0,0,0],
+	    [-2-np.sqrt(2),-1-np.sqrt(2)/2,-2-2*np.sqrt(2),2*np.sqrt(7+5*np.sqrt(2)),2*np.sqrt(1+np.sqrt(2)),2*np.sqrt(2+2*np.sqrt(2))]])
+A=A_T.T
+A_inv=np.linalg.inv(A)
+x=symbols('x')
+y=symbols('y')
+v1=np.dot([-1,x,y,-1,3-x+y,-1],A_inv)
+ff=[]
+for i in range(12):
+	ff.append(simplify(np.dot(np.dot(v1,M2[i]),v1)))
+print((ff[7]-ff[0]-ff[9]+ff[3]-ff[10]))
+#=============================================================================
+vv=[-1,1,1,-1,3,-1]
+v1=np.dot(vv,A_inv) #A_inv is as before
+print(v1)
+vv1=[1.5/3,1/3,-0.5/3,0.32179713/3,-0.77688699/3,0.77688699/3]
+print(if_adjacent_to_stratum_3order(12,[1,4,10,11,12],M1,M2,M3,vv1))
